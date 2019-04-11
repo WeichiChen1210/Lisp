@@ -10,15 +10,10 @@
             do (setq flag 1)
         )
         (if (= flag 0)
-            (format t "~A is not a prime. ~%" n)
-            (format t "~A is a prime. ~%" n)
+            (format t "~A is not a prime number. ~%" n)
+            (format t "~A is a prime number. ~%" n)
         )
-    )    
-    ;; (loop for x from 2 to n
-    ;;     (if(= (rem n x) 0)
-    ;;         (print "NO")
-    ;;         (return)))
-    ;; (print "YES")
+    )
 )
 
 (prime 2)

@@ -6,10 +6,23 @@
 )
 
 (DEFUN fib2(n)
-    (if (< n 2)
-        n
-        (+ (fib2 (- n 1)) (fib2 (- n 2)))
-    )
+    (labels ((fib-in (n a b)
+        (if (= n 0)
+            a
+            (fib-in (- n 1) b (+ a b))
+        )))
+        (fib-in n 0 1))
 )
 
-(format t "~A~%" (fib 20))
+(format t "Original resursion:")
+(trace fib1)
+(let ((x (fib1 5)))
+    (format t "result: ~A~%" x)
+)
+(untrace fib1)
+(format t "Tail resursion:")
+(trace fib2)
+(let ((x (fib2 5)))
+    (format t "result: ~A~%" x)
+)
+(untrace fib2)

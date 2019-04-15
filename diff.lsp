@@ -1,21 +1,51 @@
-(defparameter *path1* "hello-world.c")
-(defparameter *path2* "hello-world.cpp")
-(defparameter *str1* "")
-(defparameter *str2* "")
 
-(defun readfile ()
-    (with-open-file (infile1 "hello-world.c"
-                              :direction :input)
-    (with-open-file (infile2 "hello-world.cpp"
-                              :direction :input)                          
-        (do ((line1 (read-line infile1 nil 'eof) (read-line infile1 nil 'eof)))
-            ((eql line1 'eof) 'done)
-            (format t "~a~%" line1)
+(defun readfile (filename)
+    (let (
+            (linelist nil)
         )
-        (do ((line2 (read-line infile2 nil 'eof) (read-line infile2 nil 'eof)))
-            ((eql line2 'eof) 'done)
-            (format t "~a~%" line2)
+        (with-open-file (infile filename
+                                :direction :input)
+            ;; do( ((variable1 value1 updated-value1)
+            ;;      (variable2 value2 updated-value2)
+            ;;     ...)
+            ;;     (test return-value)
+            ;;     (s-expressions)
+            ;; )             
+            (do ((line (read-line infile nil 'eof) (read-line infile nil 'eof)))
+                ((equal line 'eof) 'done)
+                (push line linelist)                
+            )
+            (setq linelist (reverse linelist))
+            ;; (push nil list)
+            ;; (format t "~a~%" linelist)
         )
-   )
+        (return-from readfile linelist)
+    )
+    
 )
-(readfile)
+
+(defun longest (a b)
+  (if (> (length a) (length b)) a b))
+
+(defun lcs (a b)
+  (cond
+    ((or (null a) (null b)) nil)
+    ((eql (car a) (car b))
+       (cons (car a) (lcs (cdr a) (cdr b))))
+    (t (longest (lcs a (rest b)) (lcs (rest a) b)))))
+    
+(defun main()
+    (let (
+            (linelist1 (readfile "file1.txt"))
+            (linelist2 (readfile "file2.txt"))
+            (result nil)
+        )
+        (format t "~{~A~^ ~}~%" linelist1)
+        (format t "~{~A~^ ~}~%" linelist2)
+        (setq result (lcs '(1 2 8 4 6 9) '(1 3 7 4 6 9)))
+        (print result)
+        (print (null linelist1))
+    )
+)
+
+(main)

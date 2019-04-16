@@ -56,30 +56,30 @@
             )
         )        
         (setf len (aref pathlen n1 n2))
-        (loop for i from 1 to n1
-            do (loop for j from 1 to n2
-                do (cond
-                    ((= (aref prev i j) 0)
-                        (format t "↖"))
-                    ((= (aref prev i j) 1)
-                        (format t "←"))
-                    ((= (aref prev i j) 2)
-                        (format t "↑"))
-                )
-                do (format t "~a " (aref pathlen i j))
-            )
-            do (format t "~%")
-        )
+        ;; (loop for i from 1 to n1
+        ;;     do (loop for j from 1 to n2
+        ;;         do (cond
+        ;;             ((= (aref prev i j) 0)
+        ;;                 (format t "↖"))
+        ;;             ((= (aref prev i j) 1)
+        ;;                 (format t "←"))
+        ;;             ((= (aref prev i j) 2)
+        ;;                 (format t "↑"))
+        ;;         )
+        ;;         do (format t "~a " (aref pathlen i j))
+        ;;     )
+        ;;     do (format t "~%")
+        ;; )
         (let (
                 (lcspos1 nil)
                 (lcspos2 nil)
-                (index1 len)
-                (index2 len)
+                (index1 n1)
+                (index2 n2)
             )
-            (loop while (< len 0)
+            (loop while (> len 0)
                 do(cond
                     (
-                        (= (aref pathlen index1 index2) 0)
+                        (= (aref prev index1 index2) 0)
                         (push index1 lcspos1)
                         (push index2 lcspos2)
                         (setf index1 (- index1 1))
@@ -87,48 +87,82 @@
                         (setf len (- len 1))
                     )
                     (
-                        (= (aref pathlen index1 index2) 1)
+                        (= (aref prev index1 index2) 1)
                         (setf index2 (- index2 1))
                     )
                     (
-                        (= (aref pathlen index1 index2) 0)
+                        (= (aref prev index1 index2) 2)
                         (setf index1 (- index1 1))
                     )
                 )
             )
-            (print-diff lcspos1 lcspos2)
+            (return-from lcs (values lcspos1 lcspos2))
+            ;; (print-diff linelist1 linelist2 lcspos1 lcspos2)
         )
         
     )
 )
-
-(defun prinf-diff (pos1 pos2)
+(defun print-diff (linelist1 linelist2 pos1 pos2)
     (let 
         (
             (n1 (- (length linelist1) 1))
             (n2 (- (length linelist2) 1))
+            (curlcslen 0)
+            (pos1num (length pos1))
+            (i 1)
+            (j 1)
         )
-        (loop while (<= n1)
-            do (
-                
+        (loop while (<= i n1)
+            do(cond 
+                    (
+                        (< curlcslen pos1num)
+                        (cond
+                            (
+                                (= i (nth curlcslen pos1))
+                                (loop while (< j (nth curlcslen pos2))
+                                    do(format t "+~A~%" (nth j linelist2))
+                                    do(setf j (+ j 1))
+                                )
+                                (setf j (+ j 1))
+                                (format t " ~A~%" (nth i linelist1))
+                                (setf curlcslen (+ curlcslen 1))
+                            )
+                            (
+                                (/= i (nth curlcslen pos1))
+                                (format t "-~A~%" (nth i linelist1))
+                            )
+                        )
+                    )
+                    (
+                        (>= curlcslen pos1num)
+                        (return)
+                    )
             )
+            do(setf i (+ i 1))
+        )
+        (loop while (<= i n1)
+            do (format t "-~A~%" (nth i linelist1))
+            do (setf i (+ i 1))
+        )
+        (loop while (<= j n2)
+            do (format t "+~A~%" (nth j linelist2))
+            do (setf j (+ j 1))
         )
     )
 
 )
+
 
 (defun main()
     (let (
             (linelist1 (readfile "file1.txt"))
             (linelist2 (readfile "file2.txt"))
-            (result nil)
         )
-        (print (length linelist1))
-        (print (length linelist2))
-        
-        (format t "~{~A~^ ~}~%" linelist1)
-        (format t "~{~A~^ ~}~%" linelist2)
-        (lcs linelist1 linelist2)
+        (multiple-value-bind 
+            (pos1 pos2) 
+            (lcs linelist1 linelist2)
+            (print-diff linelist1 linelist2 pos1 pos2)
+        )
     )
 )
 

@@ -6,9 +6,10 @@
             (format t "~A is a palindrome.~%" x)
             (format t "~A is not a palindrome.~%" x)
         )))
-
-(palindrome '(a b c))
-(palindrome '(m a d a m))
-(palindrome '(cat dog))
-(palindrome '())
-(palindrome '(cat dog bird bird dog cat))
+(let 
+    (
+        (input (read-from-string (concatenate 'string "(" (read-line) ")")))
+    )
+    
+    (palindrome input)
+)

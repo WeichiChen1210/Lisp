@@ -3,7 +3,7 @@
 (DEFUN prime(n)
     (let ((flag 1))
 
-        (loop for x from 2 to (- n 1)
+        (loop for x from 2 to (/ n 2)
             if (= (mod n x) 0)
             do (setq flag 0)
             if (= n 2)
@@ -15,8 +15,9 @@
         )
     )
 )
-
-(prime 2)
-(prime 239)
-(prime 999)
-(prime 17)
+(let 
+    (
+        (n (read))
+    )
+    (prime n)
+)

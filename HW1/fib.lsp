@@ -6,12 +6,20 @@
 )
 
 (DEFUN fib2(n)
-    (labels ((fib-in (n a b)
-        (if (= n 0)
-            a
-            (fib-in (- n 1) b (+ a b))
-        )))
-        (fib-in n 0 1))
+    ;; define a local function
+    (labels (
+        (fib-in (n a b)
+            ;; if n == 0, return a
+            (if (= n 0)
+                a
+                ;; else call itself with new parameter updated
+                (fib-in (- n 1) b (+ a b))
+            )
+        )
+        )
+        ;; initial call
+        (fib-in n 0 1)
+    )
 )
 
 (let 

@@ -25,7 +25,7 @@
             (setq linelist (reverse linelist))
             ;; (format t "~a~%" linelist)
         )
-        ;; (push nil linelist)
+        (push nil linelist)
         (return-from readfile linelist)
     )
     

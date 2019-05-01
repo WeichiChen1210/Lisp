@@ -3,36 +3,55 @@ import re
 import matplotlib.pyplot as plt
 
 author = input("Input Author: ")
-author = author.replace(" ", "+")
-url = "https://arxiv.org/search/?query=" + author + "&searchtype=author&abstracts=hide&order=announced_date_first&size=200"
-content = urllib.request.urlopen(url)
-html_str = content.read().decode('utf-8')
-# pattern = 'is-size-7[\s\S]*?</p>'
-pattern = 'originally announced</span>[\s\S]*?</p>'
-result = re.findall(pattern, html_str)
-
-year = []
-times = []
-start = 0
-count = -1
+author_sp = author.replace(" ", "+")
+size = 100
+page = 0
+error = "produced no results"
+temp = []
+result = []
+while 1:
+    # all 100 articles
+    url = "https://arxiv.org/search/?query=" + author_sp + "&searchtype=author&abstracts=hide&order=announced_date_first&size=" + str(size) + "&start=" + str(page)
+    content = urllib.request.urlopen(url)
+    html_str = content.read().decode('utf-8')
+    # if no articles in this page
+    if error in html_str:
+        break
+    # find out all articles
+    pattern = 'arxiv-result[\s\S]*?</li>'
+    temp = re.findall(pattern, html_str)
+    count = 0
+    # for each article, compare the authors
+    for t in temp:
+        pattern = 'Authors:</span>[\s\S]*?</p>'
+        # find the author area
+        temp1 = re.findall(pattern, t)
+        # if there's no author's name, continue
+        if author not in temp1[0]:
+            # count += 1
+            continue
+        # if in the list, find the year
+        else:
+            pattern = 'originally announced</span>[\s\S]*?</p>'
+            result.extend(re.findall(pattern, t))
+    page += size
+# print(count)
+year_dict = {}
 print("[ Author: " + author + " ]")
 for r in result:
-    title = r.split("originally announced</span>")[1].split("</p>")[0].strip()
-    # print(title)
-    y = title.split(' ')[1].split('.')[0]
-    # print(y)
-    if y == start:
-        times[count] += 1
-    else:
-        start = y
-        year.append(start)
-        times.append(0)
-        count += 1
-        times[count] += 1
+    year = r.split("originally announced</span>")[1].split("</p>")[0].strip()
+    y = year.split(' ')[1].split('.')[0]
 
-# start = result[0].split("originally announced</span>")[1].split("</p>")[0].strip().split(' ')[1].split('.')[0]
-print(year)
-print(times)
-# print(len(year))
-plt.bar(year, times)
+    if y not in year_dict:
+        year_dict[y] = 1
+    else:
+        year_dict[y] += 1
+
+years = []
+times = []
+for key, values in year_dict.items():
+    years.append(key)
+    times.append(values)
+
+plt.bar(years, times)
 plt.show()

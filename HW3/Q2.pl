@@ -24,7 +24,7 @@ loopCall(N) :-
   N > 0,
   %write(N), nl,
   read(X1), read(X2),
-  write('Ans: '), lca(X1,X2), nl,
+  lca(X1,X2), nl,
   M is N - 1,
   loopCall(M)
   . 
